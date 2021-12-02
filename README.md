@@ -3,7 +3,7 @@
 Agenda:
 1. Ce este un container și ce probleme rezolva?
 2. Container repo
-3. Dezvoltare appilcatii
+3. Dezvoltare aplicatii
 4. Deploy aplicatii
 
 
@@ -55,7 +55,7 @@ DEVELOPMENT SCENARIO:
 dezvolti o aplicatie js pe localhost is in loc sa instalezi mongo pe local iei o imagine de pe docker hub si faci un container. apoi vrei s-o faci disponibila pt testare unui tester din alta tara si faci in felul urm:
 workflow: dev > commit on git > care va triggerui un jenkins build si va produce artefacte din aplicatia ta si o imagine > imaginea va fi urcata pe un repo privat de imagini > apoi jenkins sau alte tooluri trebuie sa deployeze acea imagine pe un development server > acel dev server ia imaginea cu aplicatia, ia mongo de pe docker hub si acum avem 2 containere care ruleaza pe dev server: una aplicatia noastra, si una mongo de pe hub si ele discuta intre ele si ruleaza ca o aplicatie > acum daca vine testerul poate sa foloseasca aplicatia
 
-voi folosi si mongo-express ca si MongoDB admin interface. c aacestea sa poata merge impreuna ne va trebui o docker network
+voi folosi si mongo-express ca si MongoDB admin interface. ca acestea sa poata merge impreuna ne va trebui o docker network
 
 Steps:
 docker network ls

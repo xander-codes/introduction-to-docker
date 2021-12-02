@@ -3,7 +3,7 @@
 Agenda:
 1. Ce este un container și ce probleme rezolva?
 2. Container repo
-3. Dezvoltare appilcatii
+3. Dezvoltare aplicatii
 4. Deploy aplicatii
 
 

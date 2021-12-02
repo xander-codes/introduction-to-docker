@@ -1,0 +1,45 @@
+version: '3'
+services:
+  server:
+    build: ./server
+    expose:
+      - ${SERVER_PORT}
+    environment:
+      API_HOST: ${API_HOST}
+      SERVER_PORT: ${SERVER_PORT}
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    command: npm start
+    links:
+      - mongodb
+
+  client:
+    build: ./client
+    environment:
+      - CLIENT_PORT=${CLIENT_PORT}
+    expose:
+      - ${CLIENT_PORT}
+    ports:
+    - ${CLIENT_PORT}:${CLIENT_PORT}
+    links:
+      - server
+    command: npm start
+
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+    - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+    driver: local

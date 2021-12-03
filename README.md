@@ -7,63 +7,65 @@ Agenda:
 4. Deploy aplicatii
 
 
-1. O modalitate de a împacheta o aplicație cu toate dependințele și configurările. Acest pachet este portabil. Face dezvoltarea mai eficienta
+1. O modalitate de a împacheta o aplicație cu toate dependințele și configurările. Acest pachet este portabil. Face dezvoltarea mai eficienta.
 
 2. Unde le gasim? Ele trăiesc în container repositories care este un tip special de storage pt containere.  
-   Multe companii au repo private dar exista și unul public DockerHub (go to hub.docker.com) și arata exemple
-- cum arata abordarea clasica: o echipa de devi pe diverse sisteme de operare care au nevoie de instalari si configurari 
-  locale locale ale tool-urilor de care au nevoie pt dezvoltare (ex: postgres, redis) si procesul de instalare arata 
-  diferit in functie de sistemul de operare, care are o gramada de pasi diferiti si sunt sanse mari sa apara erori sau 
-  configurari diferite. daca ai 10 servicii de configurat va dati seama cat dureaza
-- cu containere nu trebuie sa instalezi nici un program la tine pe calculator direct pt ca containerul este un linux 
-  izolat. aici ai totul impachetat in acest mediu izolat. Trebuie doar sa dowloadezi imaginea si s-o pornesti, este 
-  aceeasi  comanda indiferent de sistemul de operare pe care esti. daca ai 10 medii pe care trebuie sa le folosesti 
-  pt dezvoltare va trebui sa dai 10 comenzi si asta-i tot, ceea ce face setup-ul mult mai usor si mult mai eficient. 
-  poti avea versiuni diferite alea aceleiasi aplicatii fara a avea conflicte  	la deployment devii dat catre 
-  devops un pachet jar, de exemplu, impreuna cu un set de instructiuni de instalare. si daca e ceva gresit in 
-  instructiuni sau ceva este omis  atunci echipa devops va trebui sa intre din nou devii si tot asa 	in schimb, 
-  cu containere, echipele lucreaza impreuna sa impacheteze aplicatiaintr-un container, nu au nevoie de nici o 
-  configurare de mediu pe server in afara de docker engine apoi dowloadeaza imaginea si o ruleaza. 	Tehnic un 
-  container este: este un sistem de straturi de imagini unele peste altele, la baza este de obicei un linux alpine 
-  pt ca e mic apoi startul de aplicatie (ex postgres)
-  Hands on: go to docker hub, cauta postgres. in terminal dam comanda:  	docker run postgres:9.6
-  aici va rula comanda si explic layerele de baza si ca se vor downloada doar straturile diferite
+   Multe companii au repo private dar exista și unul public Docker Hub (http://hub.docker.com)
+- Cum arata abordarea clasica: o echipa de dezvoltatori pe diverse sisteme de operare care au nevoie de instalari si configurari 
+  locale ale tool-urilor cu care lucreaza (ex: postgres, redis, node) si procesul de instalare arata 
+  diferit in functie de sistemul de operare, care are o multitudine de pasi diferiti si sunt sanse mari sa apara erori sau 
+  configurari diferite. Cu cat numarul serviciilor de configurat creste cu atat creste si timpul necesar acestor configurari, 
+  complexitatea procesului si sansele de eroare.
+- Folosind containere nu este nevoie de instalare locala deoarece toate programele se vor instala in container. Aici ai 
+  totul impachetat in acest mediu izolat. Trebuie doar downloadata imaginea si pornita, se foloseste 
+  aceeasi comanda de terminal indiferent de sistemul de operare pe care se lucreaza. Daca sunt 10 medii de folosit 
+  pt dezvoltare vor trebui date 10 comenzi. Ceea ce face setup-ul mult mai usor si mai eficient. 
+  Pot co-exista versiuni diferite alea aceleiasi aplicatii fara conflicte. De exemplu, la deployment dezvoltatorii dau catre 
+  devops un pachet jar impreuna cu un set de instructiuni de instalare. Daca e ceva gresit in instructiuni sau ceva este omis
+  atunci echipa devops va trebui sa clarifice cu echipa de dezvoltare si tot asa. In schimb, cu containere, echipele lucreaza 
+  impreuna sa impacheteze aplicatia intr-unul sau mai multe containere, nu au nevoie de nici o 
+  configurare de mediu pe server in afara de docker engine apoi dowloadeaza imaginea si o ruleaza.  
+  Tehnic un container este: este un sistem de straturi de imagini, la baza este de obicei un linux alpine pt ca are dimensiune mica
+  apoi starturile de aplicatii (ex postgres)
+  Hands on: go to docker hub, cauta postgres.  
+  In terminal dam comanda: 
+  ```docker run postgres:9.6```
 
   IMAGE vs CONTAINER
   image = pachetul cu aplicatia, dependintele si configurarile (NOT RUNNING)
-  container = atunci cand down imaginea si o rulez (RUNNING)
+  container = atunci cand downloadam imaginea si o ruleam (RUNNING)
 
-  rulat din nou comanda
-  docker run postgres:10.10
-  Acestea sunt ca sa vedeti cum arata in realitate, cum se face si cum se pornesc.
+  ```docker run postgres:10.10```
 
   CONTAINER VS VIRTUAL MACHINE
 
-Docker: Hardware > OS kernel > (Applications)
-VM: Hardware > (OS kernel > Applications)
-=> marime mai mica a continerelor, viteza mai mare, compatibilitate (poti rula orice OS in VM pe orice OS) dar nu si uc docker pt ca windows nu este compatibil cu linux, ca rezolvare se poate folosi docker toolbox
+  Docker: Hardware > OS kernel > (Applications)
+  VM: Hardware > (OS kernel > Applications) => marime mai mica a continerelor, viteza mai mare, compatibilitate 
+  (orice OS in VM pe orice OS) dar nu si cu docker pt ca windows nu este compatibil cu linux, 
+  ca rezolvare se poate folosi Docker Toolbox
 
-	Pentru instalare gasiti cate un ghid cuprinzator pe net, n-o sa facem asta acum.
+  Pentru instalare gasiti cate un ghid cuprinzator pe net, n-o sa facem asta acum.
 
-	Docker  commands:
-	docker pull redis
-	docker images
-	docker run redis:alpine - this will run in attached mode
-	docker run -d redis:alpine - this runs in detached mode
-	docker ps -a
-	docker run redis:4.0 - pulls the image and starts it. 2 commands in one
+  Docker  commands:
+  ```docker pull redis
+  docker images
+  docker run redis:alpine // this will run in attached mode
+  docker run -d redis:alpine // this runs in detached mode
+  docker ps -a
+  docker run redis:4.0 // pulls the image and starts it. 2 commands in one```
+  
+  PORTS:
+  Se pot folosi aceleasi porturi pe containere diferite dar nu se pot folosi acelasi port de pe host legat de containere diferite
+  daca nu setam un port binding nu vom putea acesa si nu vom putea lucra cu acel container
+  ```docker run -d -p 6000:6379 redis:alpine```
+  
+  commands for troubleshooting: see the logs or get inside a container
+  ```docker logs [container_id] or [container_name]
+  docker run -d -p 6001:6379 --name redis-old redis:4.0 // to specify a name for the container
+  docker rename [name_or_id] [new_name]
+  docker exec -it [container_id or name] sh // for macos```
+  inside shell: ```env, cd, ls, exit```
 
-	PORTS:
-	explain that poti folosi aceleasi porturi pe containere diferite dar nu poti folosi acelasi port de pe host sa il legi de containere diferite
-	daca nu ii setam un port binding nu vom putea acesa si nu vom putea lucra cu acel container
-	docker run -d -p 6000:6379 redis:alpine
-
-	COMMANDS for troubleshooting: see the logs or get inside a container
-	docker logs [container_id] or [container_name]
-	docker run -d -p 6001:6379 --name redis-old redis:4.0 - to specify a name for the container
-	docker rename [name_or_id] [new_name]
-	docker exec -it [container_id or name] sh - for macos
-		inside: env, cd, ls, exit
 
 DEVELOPMENT SCENARIO:
 dezvolti o aplicatie js pe localhost is in loc sa instalezi mongo pe local iei o imagine de pe docker hub si faci un 

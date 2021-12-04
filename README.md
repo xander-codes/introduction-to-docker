@@ -28,7 +28,7 @@ Agenda:
   Tehnic un container este: este un sistem de straturi de imagini, la baza este de obicei un linux alpine pt ca are dimensiune mica
   apoi starturile de aplicatii (ex postgres)
   Hands on: go to docker hub, cauta postgres.  
-  In terminal dam comanda: 
+  In terminal dam comanda:  
   ```docker run postgres:9.6```
 
   IMAGE vs CONTAINER
@@ -46,96 +46,79 @@ Agenda:
 
   Pentru instalare gasiti cate un ghid cuprinzator pe net, n-o sa facem asta acum.
 
-  Docker  commands:
-  ```docker pull redis
-  docker images
-  docker run redis:alpine // this will run in attached mode
-  docker run -d redis:alpine // this runs in detached mode
-  docker ps -a
-  docker run redis:4.0 // pulls the image and starts it. 2 commands in one```
+#### Docker  commands:  
+    
+  ```docker pull redis```  
+  ```docker images```  
+  ```docker run redis:alpine```   // this will run in attached mode  
+  ```docker run -d redis:alpine```   // this runs in detached mode  
+  ```docker ps -a```  
+  ```docker run redis:4.0```   // pulls the image and starts it. 2 commands in one  
   
-  PORTS:
+#### PORTS:
   Se pot folosi aceleasi porturi pe containere diferite dar nu se pot folosi acelasi port de pe host legat de containere diferite
-  daca nu setam un port binding nu vom putea acesa si nu vom putea lucra cu acel container
+  daca nu setam un port binding nu vom putea acesa si nu vom putea lucra cu acel container  
   ```docker run -d -p 6000:6379 redis:alpine```
   
   commands for troubleshooting: see the logs or get inside a container
-  ```docker logs [container_id] or [container_name]
-  docker run -d -p 6001:6379 --name redis-old redis:4.0 // to specify a name for the container
-  docker rename [name_or_id] [new_name]
-  docker exec -it [container_id or name] sh // for macos```
+  ```docker logs [container_id] or [container_name]```  
+  ```docker run -d -p 6001:6379 --name redis-old redis:4.0``` // to specify a name for the container  
+  ```docker rename [name_or_id] [new_name]```  
+  ```docker exec -it [container_id or name] sh``` // for macos  
   inside shell: ```env, cd, ls, exit```
 
 
-DEVELOPMENT SCENARIO:
-dezvolti o aplicatie js pe localhost is in loc sa instalezi mongo pe local iei o imagine de pe docker hub si faci un 
-container. apoi vrei s-o faci disponibila pt testare unui tester din alta tara si faci in felul urm:
-workflow: dev > commit on git > care va triggerui un jenkins build si va produce artefacte din aplicatia ta 
+#### DEVELOPMENT SCENARIO:
+dezvoltam o aplicatie JS pe localhost si in loc sa instalam mongo pe local luam o imagine de pe docker hub si facem un 
+container, apoi vrem s-o facem disponibila pt testare unui tester din alta tara.
+Pt asta urmam urmatorul workflow: dezvoltare > commit on git > care va triggerui un jenkins build si va produce artefacte din aplicatie
 si o imagine > imaginea va fi urcata pe un repo privat de imagini > apoi jenkins sau alte tooluri trebuie sa deployeze 
 acea imagine pe un development server > acel dev server ia imaginea cu aplicatia, ia mongo de pe docker hub si acum 
-avem 2 containere care ruleaza pe dev server: una aplicatia noastra, si una mongo de pe hub si ele discuta intre ele 
+avem 2 containere care ruleaza pe dev server: una aplicatia noastra, si una mongo de pe hub. Cele 2 discuta intre ele 
 si ruleaza ca o aplicatie > acum daca vine testerul poate sa foloseasca aplicatia
 
-voi folosi si mongo-express ca si MongoDB admin interface. ca acestea sa poata merge impreuna ne va trebui o docker network
+Vom folosi si mongo-express ca si MongoDB admin interface. Ca acestea sa poata merge impreuna ne va trebui o docker network
 
-Steps:
-docker network ls
-docker network create mongo-network
-docker run -d \
--p 27017:27017 \
---net mongo-network \
---name mdb mongo
+Steps:  
+```docker network ls```  
+```docker network create mongo-network```  
+```docker run -d -p 27017:27017 --net mongo-network --name mdb mongo```  
+```docker logs [container_id]```  
+```docker run -d -p 8081:8081 -e ME_CONFIG_MONGODB_SERVER=mdb --net mongo-network --name mongo-express mongo-express```  
 
-	docker logs [container_id]
+#### DOCKER COMPOSE:
+Modalitatea de mai sus este lunga si este foarte posibil sa gresim, exista o alternativa: docker compose. Daca avem 10 
+containere care trebuie sa conlucreze 'docker compose' va crea automat o retea in care aceste containere sa comunice
 
-	docker run -d \
-	-p 8081:8081 \
-	-e ME_CONFIG_MONGODB_SERVER=mdb \
-	--net mongo-network \
-	--name mongo-express \
-	mongo-express
+```docker-compose up -d``` // [—build] (to trigger a new build)
+```docker-compose down```
 
-DOCKER COMPOSE:
-modalitatea de mai sus este lunga si este foarte posibil sa gresim, exista o alternativa: docker compose. daca ai 10 containere care trebuie sa conlucreze
-docker compose va crea automat o retea in care aceste containere sa comunice
+#### DOCKERFILE
+Am dezvoltat un feature si suntem gata sa facem deploy, pt asta ar trebui ca aplicatie sa fie impachetata intr-un container 
+propriu. Asta inseamna ca va trebui sa construim o imagine din aplicatia noastra. Acum ar trebui sa facem commit
+apoi jenkins face build, adica o impacheteaza intr-o imagine si o pune intr-un repository.
 
-	docker-compose up -d [—build] (to trigger a new build)
-	docker-compose down
+Dockerfile is a blueprint for building images, il avem deja in proiect. Ca sa construim efectiv imaginea rulam:
 
-DOCKERFILE
-am dezvoltat un feature si suntem gata sa facem deploy, pt asta ar trebui ca aplicatie sa fie impachetata intr-un container 
-al sau. Asta inseamna ca va trebui sa construim o imagine din aplicatia noastra
-acum ar tb sa facem commit
-apoi jenkins face build, adica o impacheteaza intr-o imagine si o sa ii dam push intr-un repository, o sa simulam asta
+```docker build -t [app_name]:1.0 .```
 
-	dockerfile is a blueprint for building images, il avem deja in proiect, de explicat ce e in el
-	ca sa construim efectiv imaginea rulam:
+#### PRIVATE REPOSITORY
+Se poate face cu AWS Elastic Container Registry si altele asemenea.
 
-	docker build -t my-app:1.0 .
-
-PRIVATE REPOSITORY:
-se poate face cu AWS Elastic Container Registry
-ar tb sa se faca push la imagini
-
-DOCKER VOLUMES:
-sumt folosite pt persistenta datelor
+#### DOCKER VOLUMES
+Sunt folosite pt persistenta datelor.
 3 tipuri: host, anonymous, named
 
-exemplu comanda cu named volume:
-docker run -d -p 5432:5432 -v pg_data:/var/lib/postgresql/data postgres:9.6
+exemplu comanda cu named volume:  
+```docker run -d -p 5432:5432 -v pg_data:/var/lib/postgresql/data postgres:9.6```
 
-docker volume ls  
-docker volume create [name]  
-docker volume inspect [name]  
-docker run -d -v test_volume:/shared-volume --name test redis:alpine
+```docker volume ls```   
+```docker volume create [name]```  
+```docker volume inspect [name]```   
+```docker run -d -v test_volume:/shared-volume --name test redis:alpine```  
 
-//pwd intoarce currrent working directory, urmatoarea comanda mapeaza pwd la /app/client din container
-//pt sincronizarea fisierelor dintre local si container/pt dezvoltare direct in container
-docker run -d -p 6000:6379 -v $PWD:/app/client redis:alpine
-docker run -d -p 6000:6379 -v `pwd`:/app/client redis:alpine
-
-docker-compose up -d
-docker-compose down
-
-
+pwd intoarce currrent working directory, urmatoarea comanda mapeaza pwd la /app/client din container  
+pt sincronizarea fisierelor dintre local si container/pt dezvoltare direct in container  
+```docker run -d -p 6000:6379 -v $PWD:/app/client redis:alpine```  
+```docker run -d -p 6000:6379 -v `pwd`:/app/client redis:alpine```  
 	
